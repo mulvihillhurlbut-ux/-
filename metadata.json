@@ -1,0 +1,6 @@
+{
+  "name": "青铜器守护·甲骨狼人杀",
+  "description": "一款商周青铜古风、殷墟甲骨文推理对战的单机解谜游戏。化身殷周贞人（解密官），灼烧龟甲解读古老卜辞，识破潜伏在青铜守护精灵中的文创卧底，维护商王朝的神秘力量！",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
