@@ -2394,9 +2394,24 @@ export default function App() {
                                           const notes = bambooScrollNotes[p.id] || [];
                                           const isStamped = notes.includes(beastSymbol);
                                           
+                                          // Calculate count of this beast across all players
+                                          let pinCount = 0;
+                                          players.forEach(pl => {
+                                            const plNotes = bambooScrollNotes[pl.id] || [];
+                                            if (plNotes.includes(beastSymbol)) {
+                                              pinCount++;
+                                            }
+                                          });
+                                          const limit = beastSymbol === twinBeast ? 2 : 1;
+                                          const isBeastOverflow = pinCount > limit;
+
                                           let buttonStyle = 'bg-stone-950 text-stone-500 hover:text-stone-300 border-stone-900';
                                           if (isStamped) {
-                                            buttonStyle = 'bg-amber-600 text-stone-950 font-black border-amber-400 shadow-[0_0_6px_rgba(245,158,11,0.5)]';
+                                            if (isBeastOverflow) {
+                                              buttonStyle = 'bg-red-950 text-red-400 font-bold border-red-500 shadow-[0_0_8px_rgba(239,68,68,0.73)] animate-pulse';
+                                            } else {
+                                              buttonStyle = 'bg-amber-600 text-stone-950 font-black border-amber-400 shadow-[0_0_6px_rgba(245,158,11,0.5)]';
+                                            }
                                           }
 
                                           return (
@@ -2407,7 +2422,7 @@ export default function App() {
                                                 handleToggleBambooStamp(p.id, beastSymbol);
                                               }}
                                               className={`flex-1 py-0.5 rounded text-[8.5px] text-center border font-mono transition-all duration-100 cursor-pointer ${buttonStyle}`}
-                                              title={`契约标记可标注 ${beastSymbol}`}
+                                              title={isBeastOverflow ? `[超额警告] ${beastSymbol}已标 ${pinCount} 人 (限 ${limit} 尊)` : `契约标记可标注 ${beastSymbol}`}
                                             >
                                               <span key={isStamped ? 'stamped' : 'unstamped'} className="inline-block animate-stamp-pop">
                                                 {beastSymbol}
@@ -4133,7 +4148,10 @@ export default function App() {
                           📝 手记标记清单 / 密室候选线索
                         </div>
                         <p className="text-[10.5px]">
-                          已在竹简手记中标记为此神兽的成员: <strong className="text-stone-200">{markedTotal.length > 0 ? markedTotal.map(p => p.name).join('、') : '暂无成员'}</strong>
+                          已在竹简手记中标记为此神兽的成员: <strong className={markedTotal.length > (beastSymbol === twinBeast ? 2 : 1) ? "text-red-400 font-extrabold animate-pulse" : "text-stone-200"}>{markedTotal.length > 0 ? markedTotal.map(p => p.name).join('、') : '暂无成员'}</strong>
+                          {markedTotal.length > (beastSymbol === twinBeast ? 2 : 1) && (
+                            <span className="text-[10px] text-red-500 font-bold block mt-1">⚠️ 冲突超额配限! ({markedTotal.length}/{beastSymbol === twinBeast ? 2 : 1} 尊)</span>
+                          )}
                         </p>
                         <p className="text-[10.5px]">
                           密室候选人包含此神兽的成员: <strong className="text-stone-200">{candidatesByChamber.length > 0 ? candidatesByChamber.map(p => p.name).join('、') : '暂无发现'}</strong>
@@ -4309,14 +4327,14 @@ export default function App() {
                     <div className="h-2 w-2 rounded-full bg-red-400" />
                     <h3 className="font-serif font-black text-red-400 text-sm">🏮 颠覆与守护：文创反叛的序幕 (阵营冲突核心剧情)</h3>
                   </div>
-                  <p className="text-xs md:text-[13px] text-stone-200 leading-relaxed font-sans">
+                  <p className="text-xs md:text-[13px] text-stone-200 leading-relaxed font-sans text-justify">
                     文创精灵热爱传统文化、热衷文博创新，但天性灵动跳脱，想要颠覆传统、重塑青铜文明的呈现方式。为了打乱古老文脉的原始传承秩序，
                     <strong className="text-red-400 font-bold mx-1">3 名文创精灵</strong>悄悄混入青铜守护精灵队伍之中，隐匿身份、暗中潜伏。
                   </p>
-                  <p className="text-xs md:text-[13px] text-stone-300 leading-relaxed font-sans mt-2">
+                  <p className="text-xs md:text-[13px] text-stone-300 leading-relaxed font-sans text-justify mt-2">
                     他们企图通过干扰推理、混淆身份、误导最终校验，打破三千年青铜文明的原始秩序，改变国宝原本的守护轨迹。
                   </p>
-                  <p className="text-xs md:text-[13px] text-stone-300 leading-relaxed font-sans mt-2">
+                  <p className="text-xs md:text-[13px] text-stone-300 leading-relaxed text-justify mt-2 font-sans text-justify">
                     而 <strong className="text-teal-400 font-bold mx-1">7 名青铜守护精灵</strong>，身负传承殷商文脉、守护国宝真身的使命。但历经千年沉睡，由于契约降临的迷思之力，所有守护精灵不仅尽数遗忘自身真身身份，且彼此之间也互相致盲、无法知晓他人的好坏阵营，只能在迷雾重重中艰难自证，推演寻找失散的真灵。
                   </p>
                 </div>
@@ -4328,7 +4346,7 @@ export default function App() {
                     <div className="h-2 w-2 rounded-full bg-teal-400" />
                     <h3 className="font-serif font-black text-teal-400 text-sm">🦴 龙骨铭卜辞：破译文脉的奥秘 (游戏核心剧情逻辑)</h3>
                   </div>
-                  <p className="text-xs md:text-[13px] text-stone-200 leading-relaxed font-sans">
+                  <p className="text-xs md:text-[13px] text-stone-200 leading-relaxed font-sans text-justify">
                     古老甲骨藏尽文明密码，是解锁身份、破译真相的关键神物。通过在祭坛回答字谜、拆解字义，玩家可以获得珍贵的“卜兆甲骨”。好人阵营在终局前，必须精诚合作、共享情报，在终极验证台完成对所有玩家真实神尊的高亮印刻。
                   </p>
                 </div>
@@ -4490,67 +4508,89 @@ export default function App() {
                 {/* CANDIDATE ANALYSIS SEGMENTS GRID */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* SEGMENT A: ACTIVE DEDUCTIVE MARKS */}
-                  <div className="bg-stone-950/40 border border-stone-800 rounded-2xl p-3 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center justify-between border-b border-stone-850 pb-1.5 mb-2">
-                        <div className="flex items-center space-x-1 text-xs font-bold text-amber-400">
-                          <span>🏮</span>
-                          <span>竹简刻印本尊的玩家 ({markedTotal.length})</span>
+                  {(() => {
+                    const limit = beastSymbol === twinBeast ? 2 : 1;
+                    const isOverflow = markedTotal.length > limit;
+                    return (
+                      <div className={`bg-stone-950/40 border rounded-2xl p-3 flex flex-col justify-between transition-all duration-300 ${
+                        isOverflow 
+                          ? 'border-red-500/90 shadow-[0_0_15px_rgba(239,68,68,0.45)]' 
+                          : 'border-stone-800'
+                      }`}>
+                        <div>
+                          <div className="flex items-center justify-between border-b border-stone-850 pb-1.5 mb-2">
+                            <div className="flex items-center space-x-1 text-xs font-bold text-amber-400">
+                              <span>🏮</span>
+                              <span className={isOverflow ? "text-red-400 font-extrabold animate-pulse" : ""}>
+                                竹简刻印本尊的玩家 ({markedTotal.length}) {isOverflow && "⚠️ 超额"}
+                              </span>
+                            </div>
+                            <span className="text-[8px] font-mono text-stone-500">SCROLL STAMPS</span>
+                          </div>
+                          
+                          {markedTotal.length === 0 ? (
+                            <div className="text-[10px] text-stone-550 italic p-4 text-center">
+                              暂无玩家被标记。可点击下方一键刻印。
+                            </div>
+                          ) : (
+                            <div className="space-y-1.5 max-h-40 overflow-y-auto custom-scrollbar">
+                              {markedTotal.map(p => {
+                                const isChamberSuspect = p.candidateOptions?.includes(beastSymbol);
+                                return (
+                                  <div key={p.id} className={`p-1.5 px-2 rounded-xl flex items-center justify-between transition text-xxs ${
+                                    isOverflow
+                                      ? 'bg-red-950/15 border border-red-500/60 hover:border-red-500'
+                                      : 'bg-amber-950/15 border border-amber-500/20 hover:border-amber-500/40'
+                                  }`}>
+                                    <div className="flex items-center space-x-1.5">
+                                      <div className={`w-1.5 h-1.5 rounded-full animate-ping ${isOverflow ? 'bg-red-500' : 'bg-amber-400'}`} />
+                                      <span className={`font-bold ${isOverflow ? 'text-red-200' : 'text-stone-200'}`}>{p.name} {p.isUser && " (你)"}</span>
+                                      {p.isEliminated ? (
+                                        <span className="text-[8px] bg-red-950/80 text-red-400 border border-red-500/20 px-1 py-0.2 rounded">出局</span>
+                                      ) : (
+                                        <span className="text-[8px] bg-emerald-950/80 text-emerald-400 border border-emerald-500/20 px-1 py-0.2 rounded">存活</span>
+                                      )}
+                                    </div>
+                                    <div className="flex items-center space-x-1.5">
+                                      {isChamberSuspect && (
+                                        <span className={`text-[8px] border px-1 py-0.2 rounded ${
+                                          isOverflow 
+                                            ? 'bg-red-900/40 text-red-300 border-red-500/20' 
+                                            : 'bg-teal-950 text-teal-300 border-teal-500/20'
+                                        }`}>密室嫌疑</span>
+                                      )}
+                                      <button
+                                        onClick={() => handleToggleBambooStamp(p.id, beastSymbol)}
+                                        className={`p-0.5 px-1.5 rounded text-[8px] transition cursor-pointer border ${
+                                          isOverflow
+                                            ? 'bg-red-950 border-red-800 text-red-300 hover:text-white'
+                                            : 'text-stone-400 hover:text-red-400 bg-stone-900 border-stone-800'
+                                        }`}
+                                      >
+                                        擦除 ✕
+                                      </button>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
                         </div>
-                        <span className="text-[8px] font-mono text-stone-500">SCROLL STAMPS</span>
-                      </div>
-                      
-                      {markedTotal.length === 0 ? (
-                        <div className="text-[10px] text-stone-550 italic p-4 text-center">
-                          暂无玩家被标记。可点击下方一键刻印。
-                        </div>
-                      ) : (
-                        <div className="space-y-1.5 max-h-40 overflow-y-auto custom-scrollbar">
-                          {markedTotal.map(p => {
-                            const isChamberSuspect = p.candidateOptions?.includes(beastSymbol);
+                        {/* Status Alert if limit exceeded */}
+                        {(() => {
+                          if (isOverflow) {
                             return (
-                              <div key={p.id} className="p-1.5 px-2 rounded-xl bg-amber-950/15 border border-amber-500/20 hover:border-amber-500/40 flex items-center justify-between transition text-xxs">
-                                <div className="flex items-center space-x-1.5">
-                                  <div className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
-                                  <span className="font-bold text-stone-200">{p.name} {p.isUser && " (你)"}</span>
-                                  {p.isEliminated ? (
-                                    <span className="text-[8px] bg-red-950/80 text-red-400 border border-red-500/20 px-1 py-0.2 rounded">出局</span>
-                                  ) : (
-                                    <span className="text-[8px] bg-emerald-950/80 text-emerald-400 border border-emerald-500/20 px-1 py-0.2 rounded">存活</span>
-                                  )}
-                                </div>
-                                <div className="flex items-center space-x-1.5">
-                                  {isChamberSuspect && (
-                                    <span className="text-[8px] bg-teal-950 text-teal-300 border border-teal-500/20 px-1 py-0.2 rounded">密室嫌疑</span>
-                                  )}
-                                  <button
-                                    onClick={() => handleToggleBambooStamp(p.id, beastSymbol)}
-                                    className="text-stone-400 hover:text-red-400 p-0.5 px-1.5 rounded bg-stone-900 border border-stone-800 text-[8px] transition cursor-pointer"
-                                  >
-                                    擦除 ✕
-                                  </button>
-                                </div>
+                              <div className="mt-2 p-1.5 rounded-xl bg-red-950/25 border border-red-500/30 text-[9px] text-red-400 flex items-start gap-1 leading-normal">
+                                <span>⚠️</span>
+                                <span>标记人数 ({markedTotal.length}) 已超过好人阵营配限 ({limit} 尊)，请及时修正冲突！</span>
                               </div>
                             );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                    {/* Status Alert if limit exceeded */}
-                    {(() => {
-                      const limit = beastSymbol === twinBeast ? 2 : 1;
-                      const isOverflow = markedTotal.length > limit;
-                      if (isOverflow) {
-                        return (
-                          <div className="mt-2 p-1.5 rounded-xl bg-red-950/25 border border-red-500/30 text-[9px] text-red-400 flex items-start gap-1 leading-normal">
-                            <span>⚠️</span>
-                            <span>标记人数 ({markedTotal.length}) 已超过好人阵营配限 ({limit} 尊)，请及时修正冲突！</span>
-                          </div>
-                        );
-                      }
-                      return null;
-                    })()}
-                  </div>
+                          }
+                          return null;
+                        })()}
+                      </div>
+                    );
+                  })()}
 
                   {/* SEGMENT B: DEDUCTION SUSPECTS ACCORDING TO SECRET CHAMBER */}
                   <div className="bg-stone-950/40 border border-stone-800 rounded-2xl p-3">
