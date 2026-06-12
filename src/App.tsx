@@ -2298,36 +2298,52 @@ export default function App() {
                                     </div>
 
                                     {/* Header section of Flipped card */}
-                                    <div className="flex items-center justify-between z-10 border-b border-stone-800/60 pb-1 shrink-0">
-                                      <div className="flex flex-col text-left">
-                                        <span className={`text-[10px] font-bold leading-none truncate max-w-[80px] ${isUser ? 'text-amber-300' : 'text-stone-200'}`}>
+                                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between z-10 border-b border-stone-800/60 pb-1.5 shrink-0 gap-1.5 sm:gap-2 w-full">
+                                      <div className="flex flex-col text-left min-w-0 w-full sm:w-auto">
+                                        <span 
+                                          className={`text-[10px] font-bold leading-tight truncate text-ellipsis overflow-hidden block ${isUser ? 'text-amber-300' : 'text-stone-200'}`} 
+                                          title={p.name}
+                                          style={{ wordBreak: 'break-word' }}
+                                        >
                                           {p.name}
                                         </span>
-                                        <span className="text-[6.5px] text-stone-500 font-mono">
+                                        <span className="text-[6.5px] text-stone-500 font-mono truncate text-ellipsis overflow-hidden block">
                                           POSITION #{p.id.toString().padStart(2, '0')}
                                         </span>
                                       </div>
 
                                       {/* Identity tags or True beast marker when known to player! */}
-                                      <div className="text-right">
+                                      <div className="text-left sm:text-right min-w-0 w-full sm:w-auto" style={{ wordBreak: 'break-word' }}>
                                         {p.isEliminated ? (
-                                          <span className="text-[7.5px] bg-red-950 text-red-400 font-bold px-1 rounded border border-red-500/20">
+                                          <span 
+                                            className="text-[7.5px] bg-red-950 text-red-400 font-bold px-1 py-0.5 rounded border border-red-500/20 inline-block max-w-full truncate text-ellipsis"
+                                            style={{ wordBreak: 'break-word' }}
+                                          >
                                             已淘汰亡星
                                           </span>
                                         ) : isCompleted ? (
-                                          <span className={`text-[7.5px] font-bold px-1 rounded border ${
-                                            p.isGood ? 'bg-teal-950 text-teal-300 border-teal-500/30' : 'bg-rose-950 text-rose-300 border-rose-500/30'
-                                          }`}>
+                                          <span 
+                                            className={`text-[7.5px] font-bold px-1 py-0.5 rounded border inline-block max-w-full truncate text-ellipsis ${
+                                              p.isGood ? 'bg-teal-950 text-teal-300 border-teal-500/30' : 'bg-rose-950 text-rose-300 border-rose-500/30'
+                                            }`}
+                                            style={{ wordBreak: 'break-word' }}
+                                          >
                                             {p.isGood ? '青铜守护' : '文创卧底'}
                                           </span>
                                         ) : !localPlayer?.isGood ? (
-                                          <span className={`text-[7.5px] font-bold px-1 rounded border ${
-                                            p.isGood ? 'bg-stone-900 border-stone-800 text-stone-400' : 'bg-rose-950 text-rose-300 border-rose-500/30'
-                                          }`}>
+                                          <span 
+                                            className={`text-[7.5px] font-bold px-1 py-0.5 rounded border inline-block max-w-full truncate text-ellipsis ${
+                                              p.isGood ? 'bg-stone-900 border-stone-800 text-stone-400' : 'bg-rose-950 text-rose-300 border-rose-500/30'
+                                            }`}
+                                            style={{ wordBreak: 'break-word' }}
+                                          >
                                             {p.id === localPlayer?.id ? '文创卧底 (你)' : p.isGood ? '待考青铜精灵' : '文创卧底队友'}
                                           </span>
                                         ) : (
-                                          <span className="text-[7px] bg-black/40 text-stone-500 border border-stone-850 px-1 rounded">
+                                          <span 
+                                            className="text-[7px] bg-black/40 text-stone-500 border border-stone-850 px-1 py-0.5 rounded inline-block max-w-full truncate text-ellipsis"
+                                            style={{ wordBreak: 'break-word' }}
+                                          >
                                             待考星格 (身份未知)
                                           </span>
                                         )}
